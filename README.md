@@ -38,43 +38,39 @@ Make sure the following tools are installed on your system:
 
 ---
 
-####### How to Run the Project (With or without Docker) ######
-##############################################################
+## How to Run the Project (With or without Docker)
 
-################ 1. Clone the Repository #####################
 
-```bash
-git clone https://github.com/qtigerq/piorfilme-backend.git
-cd piorfilme-backend
-##############################################################
+#### 1. Clone the Repository  
+
+- git clone https://github.com/qtigerq/piorfilme-backend.git
+- cd piorfilme-backend
 
 ### Without Docker
-########### 2A. Install Dependencies and Build ################
+
+#### 2A. Install Dependencies and Build  
 
 - mvn clean install
-##############################################################
 
-################ 3A. Run the Application ######################
+#### 3A. Run the Application
 
 - mvn spring-boot:run
 
 The application will start on: http://localhost:8080
-##############################################################
 
 ### With docker
-######### 2A. Run Application via Docker Compose #############
+
+#### 2A. Run Application via Docker Compose  
 
 - docker compose up --build
 
 The application will start on: http://localhost:8080
-##############################################################
 
-##################### Running Tests ##########################
+#### Running Tests
 
-mvn test
-##############################################################
+- mvn test
 
-################### H2 Database access #######################
+##### H2 Database access
 
 access via browser: http://localhost:8080/h2-console
 with credentials:
@@ -82,4 +78,3 @@ with credentials:
 			JDBC URL:	jdbc:h2:mem:piorfilme
 			User Name:	as
 			Password:	
-##############################################################
