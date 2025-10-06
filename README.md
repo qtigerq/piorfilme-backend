@@ -43,33 +43,37 @@ Make sure the following tools are installed on your system:
 
 #### 1. Clone the Repository  
 
+```
 - git clone https://github.com/qtigerq/piorfilme-backend.git
+```
+```
 - cd piorfilme-backend
+```
 
 ### Without Docker
 
 #### 2A. Install Dependencies and Build  
-
+```
 - mvn clean install
-
+```
 #### 3A. Run the Application
-
+```
 - mvn spring-boot:run
-
+```
 The application will start on: http://localhost:8080
 
 ### With docker
 
 #### 2A. Run Application via Docker Compose  
-
+```
 - docker compose up --build
-
+```
 The application will start on: http://localhost:8080
 
 #### Running Tests
-
+```
 - mvn test
-
+```
 ##### H2 Database access
 
 access via browser: http://localhost:8080/h2-console  
