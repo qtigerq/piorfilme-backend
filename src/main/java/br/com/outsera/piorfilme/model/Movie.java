@@ -1,15 +1,9 @@
 package br.com.outsera.piorfilme.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -24,13 +18,25 @@ public class Movie {
 
     @Column(name = "movie_year")
     private Long movieYear;
-    
-    @NotBlank(message = "Title is required")
+
+    @Column(nullable = false)
     private String title;
 
-    private String studios;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "movie_studio",
+        joinColumns = @JoinColumn(name = "movie_id"),
+        inverseJoinColumns = @JoinColumn(name = "studio_id")
+    )
+    private Set<Studio> studios;
 
-    private String producers;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+        name = "movie_producer",
+        joinColumns = @JoinColumn(name = "movie_id"),
+        inverseJoinColumns = @JoinColumn(name = "producer_id")
+    )
+    private Set<Producer> producers;
 
     private Boolean winner;
 }

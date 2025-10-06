@@ -61,7 +61,7 @@ public class CSVIntegrationTest {
                 saved.getWinner() == expected.getWinner()
             );
 
-            assertTrue(match, "Filme não encontrado no banco: " + expected.getTitle());
+            assertTrue(match, "Movie not found: " + expected.getTitle());
         }
     }
 

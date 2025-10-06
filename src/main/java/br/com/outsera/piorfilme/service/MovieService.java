@@ -1,6 +1,8 @@
 package br.com.outsera.piorfilme.service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,8 +12,12 @@ import org.springframework.stereotype.Service;
 
 import br.com.outsera.piorfilme.dto.StudiosWithWinCountDTO;
 import br.com.outsera.piorfilme.dto.WinIntervalDTO;
+import br.com.outsera.piorfilme.dto.WinnerDTO;
+import br.com.outsera.piorfilme.dto.WinnersByYearDTO;
 import br.com.outsera.piorfilme.dto.YearWinnersCountDTO;
 import br.com.outsera.piorfilme.model.Movie;
+import br.com.outsera.piorfilme.model.Producer;
+import br.com.outsera.piorfilme.model.Studio;
 import br.com.outsera.piorfilme.repository.MovieRepository;
 import br.com.outsera.piorfilme.repository.specification.MovieSpecifications;
 import jakarta.persistence.EntityNotFoundException;
@@ -58,10 +64,6 @@ public class MovieService {
         return movieRepository.findAll(pageable);
     }
 
-    public WinIntervalDTO findProducerWinInterval() {
-        return movieRepository.findProducerWinInterval();
-    }
-
     public Page<Movie> getPaginatedMovies(Pageable pageable, String title, String movieYear, Boolean winner) {
         if ((title == null || title.isBlank()) && (movieYear == null || movieYear.isBlank()) && winner == null) {
             return movieRepository.findAll(pageable);
@@ -78,6 +80,42 @@ public class MovieService {
 
     public StudiosWithWinCountDTO getStudiosWithWinCount() {
         return movieRepository.getStudiosWithWinCount();
+    }
+
+    public WinIntervalDTO getMaxMinWinIntervalForProducers() {
+        return movieRepository.getMaxMinWinIntervalForProducers();
+    }
+
+    public WinnersByYearDTO getWinnersByYear(String year) {
+        if (!year.isEmpty() && !year.isBlank()) {
+            Long longYear = Long.valueOf(year);
+            List<Movie> movies = movieRepository.findByMovieYearAndWinnerTrue(longYear);
+
+            return new WinnersByYearDTO(this.moviesToWinnerDTO(movies));
+        } else {
+            return new WinnersByYearDTO(new ArrayList<>());
+        }
+    }
+
+    public List<WinnerDTO> moviesToWinnerDTO(List<Movie> movies) {
+        List<WinnerDTO> winners = new ArrayList<>();
+        movies.forEach(movie -> {
+            winners.add(this.movieToWinnerDTO(movie));
+        });
+
+        return winners;
+    }
+
+    public WinnerDTO movieToWinnerDTO(Movie movie) {
+        WinnerDTO winnerDTO = new WinnerDTO();
+        winnerDTO.setId(movie.getId());
+        winnerDTO.setTitle(movie.getTitle());
+        winnerDTO.setYear(movie.getMovieYear());
+        winnerDTO.setWinner(movie.getWinner());
+        winnerDTO.setProducers(movie.getProducers().stream().map(Producer::getName).collect(Collectors.toList()));
+        winnerDTO.setStudios(movie.getStudios().stream().map(Studio::getName).collect(Collectors.toList()));
+        
+        return winnerDTO;
     }
 
 }

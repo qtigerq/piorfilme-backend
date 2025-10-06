@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.outsera.piorfilme.dto.StudiosWithWinCountDTO;
 import br.com.outsera.piorfilme.dto.WinIntervalDTO;
+import br.com.outsera.piorfilme.dto.WinnersByYearDTO;
 import br.com.outsera.piorfilme.dto.YearWinnersCountDTO;
 import br.com.outsera.piorfilme.model.Movie;
 import br.com.outsera.piorfilme.service.MovieService;
@@ -22,11 +23,6 @@ public class MovieController {
 
     @Autowired
     private MovieService movieService;
-
-    @GetMapping("/get-producers-win-intervals")
-    public WinIntervalDTO findProducerWinInterval() {
-        return movieService.findProducerWinInterval();
-    }
 
     @GetMapping
     public Page<Movie> getPaginatedMovies(Pageable pageable, @RequestParam(required = false) String title, @RequestParam(required = false) String movieYear, @RequestParam(required = false) Boolean winner) {
@@ -41,6 +37,16 @@ public class MovieController {
     @GetMapping("/studiosWithWinCount")
     public StudiosWithWinCountDTO studiosWithWinCount() {
         return movieService.getStudiosWithWinCount();
+    }
+
+    @GetMapping("/maxMinWinIntervalForProducers")
+    public WinIntervalDTO maxMinWinIntervalForProducers() {
+        return movieService.getMaxMinWinIntervalForProducers();
+    }
+
+    @GetMapping("/winnersByYear")
+    public WinnersByYearDTO winnersByYear(@RequestParam(required = false) String year) {
+        return movieService.getWinnersByYear(year);
     }
     
 }

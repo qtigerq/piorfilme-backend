@@ -15,11 +15,7 @@ import br.com.outsera.piorfilme.repository.custom.CustomMovieRepository;
 public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecificationExecutor<Movie>, CustomMovieRepository {
 
     List<Movie> findByTitleIgnoreCaseContaining(String title);
-    List<Movie> findByMovieYear(Long movieYear);
-    List<Movie> findByStudiosIgnoreCaseContaining(String studios);
-    List<Movie> findByProducersIgnoreCaseContaining(String producers);
-    List<Movie> findByWinner(Boolean winner);
-
     Page<Movie> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+    List<Movie> findByMovieYearAndWinnerTrue(Long movieYear);
 
 }

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
@@ -16,9 +17,11 @@ import br.com.outsera.piorfilme.dto.ProducerWinIntervalDTO;
 import br.com.outsera.piorfilme.dto.StudiosWithWinCountDTO;
 import br.com.outsera.piorfilme.dto.StudiosWithWinCountItemDTO;
 import br.com.outsera.piorfilme.dto.WinIntervalDTO;
+import br.com.outsera.piorfilme.dto.WinnersByYearDTO;
 import br.com.outsera.piorfilme.dto.YearWinnersCountDTO;
 import br.com.outsera.piorfilme.dto.YearWinnersCountItemDTO;
 import br.com.outsera.piorfilme.model.Movie;
+import br.com.outsera.piorfilme.model.Producer;
 
 @Repository
 public class CustomMovieRepositoryImpl implements CustomMovieRepository {
@@ -27,7 +30,7 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
     private EntityManager entityManager;
 
     @Override
-    public WinIntervalDTO findProducerWinInterval() {
+    public WinIntervalDTO getMaxMinWinIntervalForProducers() {
 
         List<Movie> winners = this.findAllWinnerMovies();
         Map<String, List<Long>> producerWins = this.getYearsOfProducerWins(winners);
@@ -44,31 +47,21 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         return entityManager.createQuery("SELECT m FROM Movie m WHERE m.winner = true", Movie.class).getResultList();
     }
 
-    private String[] getListOfProducers(String producers) {
-        String[] producersList = producers
-            .replaceAll("\\s+and\\s+", ", ")
-            .split(",\\s*");
-
-        return producersList;
-    }
-
     private Map<String, List<Long>> getYearsOfProducerWins(List<Movie> winners) {
         Map<String, List<Long>> producerWins = new HashMap<>();
 
         for (Movie movie : winners) {
-            String[] producers = this.getListOfProducers(movie.getProducers());
+            Set<Producer> producers = movie.getProducers();
 
-            for (String producer : producers) {
-                List<Long> wins = producerWins.get(producer);
+            for (Producer producer : producers) {
+                String producerName = producer.getName();
 
-                if (wins == null) {
-                    wins = new ArrayList<>();
-                    producerWins.put(producer, wins);
-                }
-
-                wins.add(movie.getMovieYear());
+                producerWins
+                    .computeIfAbsent(producerName, k -> new ArrayList<>())
+                    .add(movie.getMovieYear());
             }
         }
+
         return producerWins;
     }
 
@@ -138,5 +131,5 @@ public class CustomMovieRepositoryImpl implements CustomMovieRepository {
         response.setStudios(items);
         return response;
     }
-    
+
 }
