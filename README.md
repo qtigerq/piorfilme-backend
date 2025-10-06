@@ -72,9 +72,9 @@ The application will start on: http://localhost:8080
 
 ##### H2 Database access
 
-access via browser: http://localhost:8080/h2-console
-with credentials:
-			Driver class:	org.h2.Driver
-			JDBC URL:	jdbc:h2:mem:piorfilme
-			User Name:	as
-			Password:	
+access via browser: http://localhost:8080/h2-console  
+with credentials:  
+			- Driver class: org.h2.Driver  
+			- JDBC URL: jdbc:h2:mem:piorfilme  
+			- User Name: as  
+			- Password:  
