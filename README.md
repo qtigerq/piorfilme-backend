@@ -94,7 +94,62 @@ http://localhost:8080
 
 ### List paginated movies (optional filters)
 ```
-GET /movie?page=0&size=10&title=Batman&movieYear=1990&winner=true
+GET /movie?page=0&size=10&movieYear=1992&winner=true
+```
+
+**Example Response:**
+```json
+{
+	"content": [
+		{
+			"id": 66,
+			"movieYear": 1992,
+			"title": "Shining Through",
+			"studios": [
+				{
+					"id": 10,
+					"name": "20th Century Fox"
+				}
+			],
+			"producers": [
+				{
+					"id": 71,
+					"name": "Howard Rosenman"
+				},
+				{
+					"id": 70,
+					"name": "Carol Baum"
+				}
+			],
+			"winner": true
+		}
+	],
+	"pageable": {
+		"pageNumber": 0,
+		"pageSize": 10,
+		"sort": {
+			"empty": true,
+			"sorted": false,
+			"unsorted": true
+		},
+		"offset": 0,
+		"paged": true,
+		"unpaged": false
+	},
+	"last": true,
+	"totalPages": 1,
+	"totalElements": 1,
+	"size": 10,
+	"number": 0,
+	"sort": {
+		"empty": true,
+		"sorted": false,
+		"unsorted": true
+	},
+	"first": true,
+	"numberOfElements": 1,
+	"empty": false
+}
 ```
 
 ### Years with multiple winners
@@ -102,9 +157,48 @@ GET /movie?page=0&size=10&title=Batman&movieYear=1990&winner=true
 GET /movie/yearsWithMultipleWinners
 ```
 
+**Example Response:**
+```json
+{
+	"years": [
+		{
+			"year": 1986,
+			"winnerCount": 2
+		},
+		{
+			"year": 1990,
+			"winnerCount": 2
+		},
+		{
+			"year": 2015,
+			"winnerCount": 2
+		}
+	]
+}
+```
+
 ### Studios ranked by win count
 ```
 GET /movie/studiosWithWinCount
+```
+**Example Response:**
+```json
+{
+	"studios": [
+		{
+			"name": "Universal Studios",
+			"winCount": 2
+		},
+		{
+			"name": "Associated Film Distribution",
+			"winCount": 1
+		},
+		{
+			"name": "C2 Pictures",
+			"winCount": 1
+		}
+	]
+}
 ```
 
 ### **Producers with minimum and maximum intervals between wins** (main challenge requirement)
@@ -136,3 +230,36 @@ GET /movie/maxMinWinIntervalForProducers
 
 ### Winners by year:
 GET /movie/winnersByYear?year=1990
+
+**Example Response:**
+```json
+{
+	"winners": [
+		{
+			"id": 56,
+			"year": 1990,
+			"title": "The Adventures of Ford Fairlane",
+			"studios": [
+				"20th Century Fox"
+			],
+			"producers": [
+				"Steven Perry",
+				"Joel Silver"
+			],
+			"winner": true
+		},
+		{
+			"id": 57,
+			"year": 1990,
+			"title": "Ghosts Can't Do It",
+			"studios": [
+				"Triumph Releasing"
+			],
+			"producers": [
+				"Bo Derek"
+			],
+			"winner": true
+		}
+	]
+}
+```
