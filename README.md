@@ -82,3 +82,57 @@ with credentials:
 			- JDBC URL: jdbc:h2:mem:piorfilme  
 			- User Name: as  
 			- Password:  
+
+---
+
+## API Endpoints
+
+Base URL:
+```
+http://localhost:8080
+```
+
+### List paginated movies (optional filters)
+```
+GET /movie?page=0&size=10&title=Batman&movieYear=1990&winner=true
+```
+
+### Years with multiple winners
+```
+GET /movie/yearsWithMultipleWinners
+```
+
+### Studios ranked by win count
+```
+GET /movie/studiosWithWinCount
+```
+
+### **Producers with minimum and maximum intervals between wins** (main challenge requirement)
+```
+GET /movie/maxMinWinIntervalForProducers
+```
+
+**Example Response:**
+```json
+{
+  "min": [
+    {
+      "producer": "Producer A",
+      "interval": 1,
+      "previousWin": 2000,
+      "followingWin": 2001
+    }
+  ],
+  "max": [
+    {
+      "producer": "Producer B",
+      "interval": 13,
+      "previousWin": 1995,
+      "followingWin": 2008
+    }
+  ]
+}
+```
+
+### Winners by year:
+GET /movie/winnersByYear?year=1990
