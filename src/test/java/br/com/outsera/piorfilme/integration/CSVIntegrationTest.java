@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -63,6 +64,18 @@ public class CSVIntegrationTest {
 
             assertTrue(match, "Movie not found: " + expected.getTitle());
         }
+    }
+
+    @Test
+    public void mustNotChangeCSVFile() throws Exception {
+        Resource CSVFile = new ClassPathResource("Movielist.csv");
+
+        byte[] fileBytes = CSVFile.getInputStream().readAllBytes();
+        String hash = DigestUtils.sha256Hex(fileBytes);
+
+        String expectedHash = "df5e4a3ae2c7aeaf67d0cbf1ad39407d07d4b8ebaf538a0af436292a0c7855b1";
+
+        assertEquals(expectedHash, hash, "Movielist.csv has been modified!");
     }
 
 }

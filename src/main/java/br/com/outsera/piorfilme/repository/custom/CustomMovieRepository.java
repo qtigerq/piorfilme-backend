@@ -1,12 +1,12 @@
 package br.com.outsera.piorfilme.repository.custom;
 
-import br.com.outsera.piorfilme.dto.StudiosWithWinCountDTO;
-import br.com.outsera.piorfilme.dto.WinIntervalDTO;
-import br.com.outsera.piorfilme.dto.WinnersByYearDTO;
-import br.com.outsera.piorfilme.dto.YearWinnersCountDTO;
+import java.util.List;
+
+import br.com.outsera.piorfilme.model.Movie;
 
 public interface CustomMovieRepository {
-    WinIntervalDTO getMaxMinWinIntervalForProducers();
-    YearWinnersCountDTO getYearsWithMultipleWinners();
-    StudiosWithWinCountDTO getStudiosWithWinCount();
+    List<Movie> findAllWinnerMovies();
+    List<Object[]> findStudiosWinCounts();
+    List<Object[]> findYearsWithMultipleWinners();
+    List<Object[]> findProducerWinIntervals();
 }

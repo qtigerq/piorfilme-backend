@@ -1,7 +1,6 @@
 package br.com.outsera.piorfilme.service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import br.com.outsera.piorfilme.dto.StudiosWithWinCountDTO;
-import br.com.outsera.piorfilme.dto.WinIntervalDTO;
-import br.com.outsera.piorfilme.dto.WinnerDTO;
-import br.com.outsera.piorfilme.dto.WinnersByYearDTO;
-import br.com.outsera.piorfilme.dto.YearWinnersCountDTO;
+import br.com.outsera.piorfilme.dto.*;
 import br.com.outsera.piorfilme.model.Movie;
 import br.com.outsera.piorfilme.model.Producer;
 import br.com.outsera.piorfilme.model.Studio;
@@ -24,7 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class MovieService {
-    
+
     @Autowired
     private MovieRepository movieRepository;
 
@@ -49,7 +44,8 @@ public class MovieService {
     }
 
     public Movie update(Long id, Movie movie) {
-        Movie existingMovie = movieRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Movie with id " + id + " not found"));
+        Movie existingMovie = movieRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Movie with id " + id + " not found"));
 
         existingMovie.setMovieYear(movie.getMovieYear());
         existingMovie.setTitle(movie.getTitle());
@@ -68,54 +64,78 @@ public class MovieService {
         if ((title == null || title.isBlank()) && (movieYear == null || movieYear.isBlank()) && winner == null) {
             return movieRepository.findAll(pageable);
         }
-
         Specification<Movie> filters = MovieSpecifications.withFilters(title, movieYear, winner);
-
         return movieRepository.findAll(filters, pageable);
     }
 
     public YearWinnersCountDTO getYearsWithMultipleWinners() {
-        return movieRepository.getYearsWithMultipleWinners();
+        List<Object[]> rows = movieRepository.findYearsWithMultipleWinners();
+
+        List<YearWinnersCountItemDTO> items = rows.stream()
+                .map(r -> new YearWinnersCountItemDTO((Long) r[0], (Long) r[1]))
+                .collect(Collectors.toList());
+
+        return new YearWinnersCountDTO(items);
     }
 
     public StudiosWithWinCountDTO getStudiosWithWinCount() {
-        return movieRepository.getStudiosWithWinCount();
+        List<Object[]> rows = movieRepository.findStudiosWinCounts();
+
+        List<StudiosWithWinCountItemDTO> items = rows.stream()
+                .map(r -> new StudiosWithWinCountItemDTO((String) r[0], (Long) r[1]))
+                .collect(Collectors.toList());
+
+        return new StudiosWithWinCountDTO(items);
     }
 
     public WinIntervalDTO getMaxMinWinIntervalForProducers() {
-        return movieRepository.getMaxMinWinIntervalForProducers();
+        List<Object[]> rows = movieRepository.findProducerWinIntervals();
+
+        List<ProducerWinIntervalDTO> intervals = rows.stream()
+                .filter(r -> r[1] != null)
+                .map(r -> new ProducerWinIntervalDTO(
+                        (String) r[0],
+                        ((Number) r[1]).longValue(),
+                        ((Number) r[2]).longValue(),
+                        ((Number) r[3]).longValue()
+                )).toList();
+
+        if (intervals.isEmpty()) {
+            return new WinIntervalDTO(List.of(), List.of());
+        }
+
+        long min = intervals.stream().mapToLong(ProducerWinIntervalDTO::getInterval).min().orElse(0);
+        long max = intervals.stream().mapToLong(ProducerWinIntervalDTO::getInterval).max().orElse(0);
+
+        List<ProducerWinIntervalDTO> minList = intervals.stream().filter(i -> i.getInterval() == min).toList();
+        List<ProducerWinIntervalDTO> maxList = intervals.stream().filter(i -> i.getInterval() == max).toList();
+
+        return new WinIntervalDTO(minList, maxList);
     }
 
     public WinnersByYearDTO getWinnersByYear(String year) {
-        if (!year.isEmpty() && !year.isBlank()) {
-            Long longYear = Long.valueOf(year);
-            List<Movie> movies = movieRepository.findByMovieYearAndWinnerTrue(longYear);
-
-            return new WinnersByYearDTO(this.moviesToWinnerDTO(movies));
-        } else {
+        if (year == null || year.isBlank()) {
             return new WinnersByYearDTO(new ArrayList<>());
         }
+
+        Long parsedYear = Long.valueOf(year);
+        List<Movie> movies = movieRepository.findByMovieYearAndWinnerTrue(parsedYear);
+        return new WinnersByYearDTO(moviesToWinnerDTO(movies));
     }
 
     public List<WinnerDTO> moviesToWinnerDTO(List<Movie> movies) {
-        List<WinnerDTO> winners = new ArrayList<>();
-        movies.forEach(movie -> {
-            winners.add(this.movieToWinnerDTO(movie));
-        });
-
-        return winners;
+        return movies.stream().map(this::movieToWinnerDTO).collect(Collectors.toList());
     }
 
     public WinnerDTO movieToWinnerDTO(Movie movie) {
-        WinnerDTO winnerDTO = new WinnerDTO();
-        winnerDTO.setId(movie.getId());
-        winnerDTO.setTitle(movie.getTitle());
-        winnerDTO.setYear(movie.getMovieYear());
-        winnerDTO.setWinner(movie.getWinner());
-        winnerDTO.setProducers(movie.getProducers().stream().map(Producer::getName).collect(Collectors.toList()));
-        winnerDTO.setStudios(movie.getStudios().stream().map(Studio::getName).collect(Collectors.toList()));
-        
-        return winnerDTO;
+        WinnerDTO dto = new WinnerDTO();
+        dto.setId(movie.getId());
+        dto.setTitle(movie.getTitle());
+        dto.setYear(movie.getMovieYear());
+        dto.setWinner(movie.getWinner());
+        dto.setProducers(movie.getProducers().stream().map(Producer::getName).toList());
+        dto.setStudios(movie.getStudios().stream().map(Studio::getName).toList());
+        return dto;
     }
 
 }
